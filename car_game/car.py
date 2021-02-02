@@ -20,9 +20,11 @@ class Car:
             self.gears += [self.font.render(self.msg[i],1,(250,250,250))]
         self.speedo = []
         self.laps = []
+        self.timer = 0
         for i in range(101):
             self.speedo += [self.font.render("SPEED "+str(i),1,(250,250,250))]
             self.laps += [self.font.render("LAP "+str(i),1,(250,250,250))]
+            
     def load_car_sprite(self,path,NF):
         self.view = 270
         self.images = []
@@ -60,6 +62,7 @@ class Car:
 
     def update(self):
         self.gear_lock += 1
+        self.timer += 1
         self.speed = .95*self.speed + .05*(2.5*self.gear)
         #print (self.gear,'\t',int(10.0*self.speed),'\t',self.lap)
         
