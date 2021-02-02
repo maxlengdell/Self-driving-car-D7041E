@@ -18,16 +18,17 @@ class carGame:
         self.visible_track = pygame.image.load('track_textured.png')
         self.start_line = pygame.Rect(844, 1324, 140, 200)
         self.clr_outside_trk = self.track.get_at((0, 0))
-
+        self.total_cars = 1
         self.frames = 0
-
-        print("init done")
+        self.all_cars = []
 
     def track_setup(self):
-
-        self.red_car = car.Car()
-        self.red_car.load_car_sprite('red', 360)
-        self.red_car.draw_car(self.red_car.xs, self.red_car.ys, self.screen)
+        for i in range(self.total_cars):
+            red_car = car.Car()
+            red_car.load_car_sprite('red', 360)
+            self.all_cars.append(red_car)
+    
+        
 
     def game_setup(self):
         #car.max_laps = self.max_laps
@@ -44,7 +45,6 @@ class carGame:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == KEYDOWN:
-                print("Current gear: ", car.gear)
 
                 if event.key == K_ESCAPE:
                     self.running = False
@@ -53,7 +53,7 @@ class carGame:
 
                     if car.gear_lock > 24:
                         car.gear += 1
-                        print(car.gear)
+
                         car.gear_lock = 0
                         if car.gear > 4:
                             car.gear = 4
@@ -80,27 +80,25 @@ class carGame:
                 car.lap += 1
                 car.timer = 0
 
-
-
-
     def game_loop(self):
         while self.running:
-            #____Graphical updates___
-            car = self.red_car
-            #print(car.xc, car.yc)
-            self.frames += 1
+            for car in self.all_cars:
+                #____Graphical updates___
+                #car = self.red_car
+                #print(car.xc, car.yc)
+                self.frames += 1
 
-            car.update()
-            self.clock.tick(24)
-            self.screen.fill((0, 192, 0))
-            self.screen.blit(self.visible_track,
-                             (car.xs-car.xc, car.ys-car.yc))
-            car.draw_car(self.red_car.xs, self.red_car.ys, self.screen)
-            pygame.display.flip()
-            #____Computing of car___
-            self.user_control(car)
-            self.collision(car)
-            self.check_lap(car)
+                car.update()
+                self.clock.tick(24)
+                self.screen.fill((0, 192, 0))
+                self.screen.blit(self.visible_track,
+                                (car.xs-car.xc, car.ys-car.yc))
+                car.draw_car(car.xs, car.ys, self.screen)
+                pygame.display.flip()
+                #____Computing of car___
+                self.user_control(car)
+                self.collision(car)
+                self.check_lap(car)
 
 
 
