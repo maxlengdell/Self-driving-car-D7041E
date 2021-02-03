@@ -28,8 +28,6 @@ class carGame:
             red_car.load_car_sprite('red', 360)
             self.all_cars.append(red_car)
     
-        
-
     def game_setup(self):
         #car.max_laps = self.max_laps
         self.clock = pygame.time.Clock()
@@ -82,23 +80,28 @@ class carGame:
 
     def game_loop(self):
         while self.running:
+            #front, left, right collision sensor
+            #current gear
             for car in self.all_cars:
                 #____Graphical updates___
-                #car = self.red_car
-                #print(car.xc, car.yc)
+   
                 self.frames += 1
 
                 car.update()
                 self.clock.tick(24)
                 self.screen.fill((0, 192, 0))
                 self.screen.blit(self.visible_track,
-                                (car.xs-car.xc, car.ys-car.yc))
+                                (self.all_cars[0].xs-self.all_cars[0].xc, self.all_cars[0].ys-self.all_cars[0].yc))
+
+                input_network = car.distance_from_car(self.screen, self.track, self.clr_outside_trk)
+                
                 car.draw_car(car.xs, car.ys, self.screen)
                 pygame.display.flip()
                 #____Computing of car___
                 self.user_control(car)
                 self.collision(car)
                 self.check_lap(car)
+                
 
 
 
