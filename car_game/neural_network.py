@@ -4,7 +4,7 @@ class Network:
     def __init__(self, model):
         #Input: distance left, right, forward, speed, gear
         #
-        self.lr = 0.1
+        self.lr = 0.5
         self.model = model
         self.layers = []
         self.weights = []
@@ -29,7 +29,7 @@ class Network:
         for i in range(1,len(self.layers)):
             self.layers[i] = self.activation(np.matmul(self.layers[i-1], self.weights[i-1]))
 
-        #print("\r next move: {} layers: {}".format(np.argmax(self.layers[-1]),self.layers[-1]), end="\r")
+        print("\r next move: {} layers: {}".format(np.argmax(self.layers[-1]),self.layers[-1]), end="\r")
 
         return np.argmax(self.layers[-1])
 
@@ -42,7 +42,7 @@ class Network:
     def mutate_weights(self):
 
         for i in range(len(self.weights)):
-            self.weights[i] = self.weights[i] + np.random.rand(self.weights[i].shape[0], self.weights[i].shape[1]) * self.lr
+            self.weights[i] = self.weights[i] + np.random.uniform(-1,1,(self.weights[i].shape[0], self.weights[i].shape[1])) * self.lr
 
 
     def ReLU(self,x):

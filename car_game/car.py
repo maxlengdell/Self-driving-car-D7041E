@@ -49,9 +49,9 @@ class Car:
         self.images = []
         self.NF = NF
         self.xc = 500
-        self.yc = 850
+        self.yc = 870
         self.xf = 500
-        self.yf = 850
+        self.yf = 870
         self.speed = 0
         self.gear = 1
         self.wobble = 0
@@ -144,7 +144,7 @@ class Car:
             direct = math.radians(self.direction)
             theta = self.view/57.296
             c_front = 100
-            c_sides = 50
+            c_sides = 100
             x_front = int(c_front*math.sin(theta))
             y_front = int(c_front*math.cos(theta))
             x_right = int(c_sides*math.sin(theta + math.pi/2))

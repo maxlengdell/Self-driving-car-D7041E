@@ -26,6 +26,7 @@ class CarGame:
         self.total_cars = 10
         self.frames = 0
         self.all_cars = []
+        self.best_score = 0
         self.dead_cars = []
         self.network_size = [5,10,5]
         self.generation = 0
@@ -97,11 +98,11 @@ class CarGame:
             #self.user_control(self.all_cars[0])
             #time.sleep(0.15)
             self.screen.fill((0, 192, 0))
-            self.clock.tick(60)
+            self.clock.tick(1000)
             self.frames += 1
             self.screen.blit(self.visible_track,(0,0))
             key = pygame.key.get_pressed()
-            print("\r Length of cars: {}, generation: {}".format(len(self.all_cars), self.generation),end="\r")
+            print("\r Generation: {}, best score: {},Length of cars: {}".format(self.generation,int(self.best_score),len(self.all_cars),),end="\r")
 
             for car in self.all_cars:
                 #____Graphical updates___
@@ -133,12 +134,13 @@ class CarGame:
 
 
     def best_score_network(self, cars):
-        best_score = 0
+        self.best_score = 0
         best_network = 0
         for car in cars:
-            if(best_score < car[1]):
+            if(self.best_score < car[1]):
                 best_network = car[0]
-                best_score = car[1]
+                self.best_score = car[1]
+        
         return best_network
 
 
