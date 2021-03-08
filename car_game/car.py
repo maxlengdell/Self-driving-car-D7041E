@@ -49,10 +49,10 @@ class Car:
         self.view = 270
         self.images = []
         self.NF = NF
-        self.xc = 370
-        self.yc = 750
-        self.xf = 370
-        self.yf = 750
+        self.xc = 0.49*1920
+        self.yc = 0.67*1080
+        self.xf = 0.49*1920
+        self.yf = 0.67*1080
         self.speed = 0
         self.gear = 1
         self.wobble = 0
@@ -106,9 +106,8 @@ class Car:
         #Feed to network
 
         self.score += np.sqrt(vx**2 + vy**2)
-
         #next move
-        next_move = self.network.next_move(self) #Returns vector with probability of the next move
+        next_move = self.network.next_move(self, 300) #Returns vector with probability of the next move
         #print("Next move", next_move)
         self.move(next_move)
 
@@ -116,7 +115,6 @@ class Car:
         if(next_move==0):
             #gear up
             if self.gear_lock > 24:
-                self.score += 10
                 self.gear += 1
                 self.gear_lock = 0
                 if self.gear > 4:
@@ -130,11 +128,11 @@ class Car:
 
         elif(next_move==2):
             #left
-            self.view = (self.view+2) % 360
+            self.view = (self.view+3) % 360
 
         elif(next_move==3):
             #right
-            self.view = (self.view+358) % 360
+            self.view = (self.view+357) % 360
         elif(next_move==4):
             #Go straight
             return
@@ -145,52 +143,56 @@ class Car:
 
             direct = math.radians(self.direction)
             theta = self.view/57.296
-            c_front = 180
-            c_sides = 140
-            c_diag = 130
-            x_front = int(c_front*math.sin(theta))
-            y_front = int(c_front*math.cos(theta))
-            x_right = int(c_sides*math.sin(theta + math.pi/2))
-            y_right = int(c_sides*math.cos(theta + math.pi/2))
-            x_left = int(c_sides*math.sin(theta - math.pi/2))
-            y_left = int(c_sides*math.cos(theta - math.pi/2))
+            c = 300
+            x_front = int(c*math.sin(theta))
+            y_front = int(c*math.cos(theta))
+            x_right = int(c*math.sin(theta + math.pi/2))
+            y_right = int(c*math.cos(theta + math.pi/2))
+            x_left = int(c*math.sin(theta - math.pi/2))
+            y_left = int(c*math.cos(theta - math.pi/2))
 
-            x_45_r = int(c_diag*math.sin(theta + math.pi/4))
-            y_45_r = int(c_diag*math.cos(theta + math.pi/4))
+            x_60_r = int(c*math.sin(theta + math.pi/3))
+            y_60_r = int(c*math.cos(theta + math.pi/3))
+            x_60_l = int(c*math.sin(theta - math.pi/3))
+            y_60_l = int(c*math.cos(theta - math.pi/3))
 
-            x_45_l = int(c_diag*math.sin(theta - math.pi/4))
-            y_45_l = int(c_diag*math.cos(theta - math.pi/4))
+            x_30_r = int(c*math.sin(theta + math.pi/6))
+            y_30_r = int(c*math.cos(theta + math.pi/6))
+            x_30_l = int(c*math.sin(theta - math.pi/6))
+            y_30_l = int(c*math.cos(theta - math.pi/6))
 
-            dist_front = c_front
-            dist_left = c_sides
-            dist_right = c_sides
-            dist_diag_left = c_diag
-            dist_diag_right = c_diag
+            dist = c
 
-            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_front,self.yc - y_front)) 
-            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_left,self.yc - y_left)) 
-            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_right,self.yc - y_right)) 
+            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_front,self.yc - y_front)) 
+            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_left,self.yc - y_left)) 
+            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_right,self.yc - y_right)) 
             
-            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_45_r,self.yc - y_45_r)) 
-            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_45_l,self.yc - y_45_l)) 
+            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_60_r,self.yc - y_60_r)) 
+            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_60_l,self.yc - y_60_l)) 
 
             # surface_infront = track.get_at((self.xc + x_front, self.yc - y_front))
             # surface_left = track.get_at((self.xc + x_left, self.yc - y_left))
             # surface_right = track.get_at((self.xc + x_right, self.yc - y_right))
-            # surface_diag_left = track.get_at((self.xc + x_45_l, self.yc - y_45_l))
-            # surface_diag_right = track.get_at((self.xc + x_45_r, self.yc - y_45_r))
+            # surface_diag_left = track.get_at((self.xc + x_60_l, self.yc - y_60_l))
+            # surface_diag_right = track.get_at((self.xc + x_60_r, self.yc - y_60_r))
 
-            dist_front = self.calc_distance(c_front, track, x_front, y_front, clr_outside_trk)
-            dist_left = self.calc_distance(c_sides, track,x_left,y_left,clr_outside_trk)
-            dist_right = self.calc_distance(c_sides, track,x_right,y_right,clr_outside_trk)
-            dist_diag_left = self.calc_distance(c_diag, track, x_45_l,y_45_l,clr_outside_trk)
-            dist_diag_right = self.calc_distance(c_diag, track, x_45_r,y_45_r,clr_outside_trk)
+            dist_front = self.calc_distance(c, track, x_front, y_front, clr_outside_trk)
+
+            dist_left = self.calc_distance(c, track,x_left,y_left,clr_outside_trk)
+            dist_right = self.calc_distance(c, track,x_right,y_right,clr_outside_trk)
+
+            dist_60_left = self.calc_distance(c, track, x_60_l,y_60_l,clr_outside_trk)
+            dist_60_right = self.calc_distance(c, track, x_60_r,y_60_r,clr_outside_trk)
+            
+            dist_30_left = self.calc_distance(c, track, x_30_l,y_30_l,clr_outside_trk)
+            dist_30_right = self.calc_distance(c, track, x_30_r,y_30_r,clr_outside_trk)
 
             #print("Dist front", dist_front)
 
-            return [dist_front, dist_left, dist_right, dist_diag_left, dist_diag_right]
+            return [dist_front, dist_left, dist_right, dist_30_left, dist_30_right, dist_60_left, dist_60_right]
         
         except IndexError:
+            print("INDEX FUCKERS")
             return [1,1,1,1,1]
         
 
