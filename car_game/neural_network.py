@@ -20,30 +20,34 @@ class Network:
         self.layers = np.array(self.layers)
 
     def next_move(self, car):
-        #print("Dist", car.dist)
-        #print("Speed", car.speed)
-        #print("gear", car.gear)
-
-        self.layers[0] = self.normalize_input(np.concatenate([car.dist,[car.speed],[car.gear]])) #input
+        norm_dist = self.normalize_dist(car.dist)
+        norm_speed = self.normalize_input(car.speed)
+        norm_gear = self.normalize_input(car.gear)
+        self.layers[0] = np.concatenate([car.dist,[car.speed],[car.gear]]) #input
 
         for i in range(1,len(self.layers)):
             self.layers[i] = self.activation(np.matmul(self.layers[i-1], self.weights[i-1]))
 
-        print("\r next move: {} layers: {}".format(np.argmax(self.layers[-1]),self.layers[-1]), end="\r")
+        #print("\r next move: {} layers: {}".format(np.argmax(self.layers[-1]),self.layers[-1]), end="\r")
 
         return np.argmax(self.layers[-1])
 
     def normalize_input(self,X):
-        tanh_v = np.vectorize(self.tanh_norm)
-        return tanh_v(X)
+        #tanh_v = np.vectorize(self.tanh_norm)
+        #return #tanh_v(X)
+        return X/100
+    def normalize_dist(self,X):
+        y = (X-np.max(X))/(np.max(X)-np.min(X))
+        #print(y)
+        return y
     def activation(self,X):
         tanh_v = np.vectorize(self.tanh)
         return tanh_v(X)
-    def mutate_weights(self):
+    def mutate_weights(self, score, decay):
+        #print("LR:", self.lr/(score/decay))
 
         for i in range(len(self.weights)):
-            self.weights[i] = self.weights[i] + np.random.uniform(-1,1,(self.weights[i].shape[0], self.weights[i].shape[1])) * self.lr
-
+            self.weights[i] = self.weights[i] + np.random.uniform(-1,1,(self.weights[i].shape[0], self.weights[i].shape[1])) * self.lr/(score/decay)
 
     def ReLU(self,x):
         return np.maximum(x,0)

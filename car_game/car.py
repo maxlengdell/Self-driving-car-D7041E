@@ -25,16 +25,17 @@ class Car:
         self.msg = ["STOP", "GEAR 1", "GEAR 2", "GEAR 3", "GEAR 4"]
         self.gears = []
         self.gear_lock = 24
-        for i in range(len(self.msg)):
-            self.gears += [self.font.render(self.msg[i],1,(250,250,250))]
+        # for i in range(len(self.msg)):
+        #     self.gears += [self.font.render(self.msg[i],1,(250,250,250))]
         self.speedo = []
         self.laps = []
         self.dist = []
         self.timer = 0
         self.direction = 0
-        for i in range(101):
-            self.speedo += [self.font.render("SPEED "+str(i),1,(250,250,250))]
-            self.laps += [self.font.render("LAP "+str(i),1,(250,250,250))]
+        self.wobble = 15
+        # for i in range(101):
+        #     self.speedo += [self.font.render("SPEED "+str(i),1,(250,250,250))]
+        #     self.laps += [self.font.render("LAP "+str(i),1,(250,250,250))]
 
         #Network
         self.score = 0
@@ -48,10 +49,10 @@ class Car:
         self.view = 270
         self.images = []
         self.NF = NF
-        self.xc = 500
-        self.yc = 870
-        self.xf = 500
-        self.yf = 870
+        self.xc = 370
+        self.yc = 750
+        self.xf = 370
+        self.yf = 750
         self.speed = 0
         self.gear = 1
         self.wobble = 0
@@ -67,17 +68,17 @@ class Car:
                 name += '0'
             self.images += [pygame.image.load(name+str(f+1)+'.png')]
     def draw_car(self,x,y,screen):
-        view = self.view
+        view = self.view + int(random.gauss(0,self.wobble))
 
         if view < 0 :
             view = view + 360
         view = view%360
 
         screen.blit(self.images[self.view],(x-32,y-32))
-        screen.blit(self.gears[self.gear],(self.xt,self.yt))
+        #screen.blit(self.gears[self.gear],(self.xt,self.yt))
         indicated = int(10.0*self.speed)
-        screen.blit(self.speedo[indicated],(self.xt+100,self.yt))
-        screen.blit(self.laps[self.lap],(self.xt,self.yt+50))
+        #screen.blit(self.speedo[indicated],(self.xt+100,self.yt))
+        #screen.blit(self.laps[self.lap],(self.xt,self.yt+50))
 
     def update(self):
 
@@ -115,6 +116,7 @@ class Car:
         if(next_move==0):
             #gear up
             if self.gear_lock > 24:
+                self.score += 10
                 self.gear += 1
                 self.gear_lock = 0
                 if self.gear > 4:
@@ -143,8 +145,9 @@ class Car:
 
             direct = math.radians(self.direction)
             theta = self.view/57.296
-            c_front = 100
-            c_sides = 100
+            c_front = 180
+            c_sides = 140
+            c_diag = 130
             x_front = int(c_front*math.sin(theta))
             y_front = int(c_front*math.cos(theta))
             x_right = int(c_sides*math.sin(theta + math.pi/2))
@@ -152,40 +155,54 @@ class Car:
             x_left = int(c_sides*math.sin(theta - math.pi/2))
             y_left = int(c_sides*math.cos(theta - math.pi/2))
 
+            x_45_r = int(c_diag*math.sin(theta + math.pi/4))
+            y_45_r = int(c_diag*math.cos(theta + math.pi/4))
+
+            x_45_l = int(c_diag*math.sin(theta - math.pi/4))
+            y_45_l = int(c_diag*math.cos(theta - math.pi/4))
+
             dist_front = c_front
             dist_left = c_sides
             dist_right = c_sides
+            dist_diag_left = c_diag
+            dist_diag_right = c_diag
 
             pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_front,self.yc - y_front)) 
             pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_left,self.yc - y_left)) 
             pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_right,self.yc - y_right)) 
+            
+            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_45_r,self.yc - y_45_r)) 
+            pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_45_l,self.yc - y_45_l)) 
 
+            # surface_infront = track.get_at((self.xc + x_front, self.yc - y_front))
+            # surface_left = track.get_at((self.xc + x_left, self.yc - y_left))
+            # surface_right = track.get_at((self.xc + x_right, self.yc - y_right))
+            # surface_diag_left = track.get_at((self.xc + x_45_l, self.yc - y_45_l))
+            # surface_diag_right = track.get_at((self.xc + x_45_r, self.yc - y_45_r))
 
-            surface_infront = track.get_at((self.xc + x_front, self.yc - y_front))
-            surface_left = track.get_at((self.xc + x_left, self.yc - y_left))
-            surface_right = track.get_at((self.xc + x_right, self.yc - y_right))
+            dist_front = self.calc_distance(c_front, track, x_front, y_front, clr_outside_trk)
+            dist_left = self.calc_distance(c_sides, track,x_left,y_left,clr_outside_trk)
+            dist_right = self.calc_distance(c_sides, track,x_right,y_right,clr_outside_trk)
+            dist_diag_left = self.calc_distance(c_diag, track, x_45_l,y_45_l,clr_outside_trk)
+            dist_diag_right = self.calc_distance(c_diag, track, x_45_r,y_45_r,clr_outside_trk)
 
-            if(surface_infront == clr_outside_trk):
-                dist_front = self.calc_distance(c_front, track,x_front,y_front,clr_outside_trk)
-            if(surface_left == clr_outside_trk):
-                dist_left = self.calc_distance(c_sides, track,x_left,y_left,clr_outside_trk)
-            if(surface_right == clr_outside_trk):
-                dist_right = self.calc_distance(c_sides, track,x_right,y_right,clr_outside_trk)
-            return [dist_front, dist_left, dist_right]
+            #print("Dist front", dist_front)
+
+            return [dist_front, dist_left, dist_right, dist_diag_left, dist_diag_right]
         
         except IndexError:
-            return [1,1,1]
+            return [1,1,1,1,1]
         
 
     def calc_distance(self,size_of_line,track, x_cord, y_cord, clr_outside_trk):
-        i = 10
+        i = 100
         while i >= 1:
             x = int(self.xc + x_cord/i)
             y = int(self.yc - y_cord/i)
 
             ground = track.get_at((x,y))
+
             if(ground == clr_outside_trk):
-                #print("distance: ", size_of_line/i, "i is: ", i)
                 return size_of_line/i
-            i -= 0.5
-        return -1
+            i -= 0.1
+        return size_of_line
