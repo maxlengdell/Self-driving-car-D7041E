@@ -21,6 +21,7 @@ class Network:
 
     def next_move(self, car, maxRange):
         norm_dist = self.normalize_dist(car.dist,maxRange)
+
         norm_speed = self.normalize_input(car.speed)
         norm_gear = car.gear/4
         self.layers[0] = np.concatenate([car.dist,[car.speed],[car.gear]]) #input
@@ -36,17 +37,17 @@ class Network:
         #return #tanh_v(X)
         return X/100
     def normalize_dist(self,X, maxRange):
-        y = (X-np.int64(maxRange))/(np.int64(maxRange) - np.int64(0))
-        #print(y)
+        #print("X:", X[0])
+        y = np.abs((X-np.int64(maxRange))/(np.int64(maxRange) - np.int64(0)))
+
         return y
     def activation(self,X):
         tanh_v = np.vectorize(self.tanh)
         return tanh_v(X)
     def mutate_weights(self, score, decay):
         #print("LR:", self.lr/(score/decay))
-
         for i in range(len(self.weights)):
-            self.weights[i] = self.weights[i] + np.random.uniform(-1,1,(self.weights[i].shape[0], self.weights[i].shape[1])) * self.lr/(score/decay)
+            self.weights[i] = self.weights[i] + np.random.uniform(-1,1,(self.weights[i].shape[0], self.weights[i].shape[1])) * self.lr#/(score/decay)
 
     def store_weights(self, weights):
         self.weights = weights
