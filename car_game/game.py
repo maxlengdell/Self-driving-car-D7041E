@@ -25,11 +25,11 @@ class CarGame:
         self.best_score = 0
         self.best_network = 0
         self.dead_cars = []
-        self.network_size = [9, 14, 5]
+        self.network_size = [11, 17, 5]
         self.generation = 0
-        self.lr_decay = 400
+        self.lr_decay = 1500
         self.inMenu = True
-        self.currentMap = 'T5.png'
+        self.currentMap = 'T4.png'
 
     def load_map(self, trackPic):
         # print(self.resolution)
@@ -169,7 +169,7 @@ class CarGame:
 
             if(len(self.all_cars) == 0):
                 # Respawn all cars with brains based on the best performer
-                best_network = self.best_score_network(self.dead_cars)
+                best_network = self.best_score_network(self.dead_cars, self.all_cars)
                 self.dead_cars.clear()
                 self.all_cars.clear()
                 self.track_setup(best_network, numberOfCars=numberOfCars)
@@ -220,17 +220,35 @@ class CarGame:
                         self.main_menu()
 
     def save_best_car(self, filename):
-        best_score = 0
-        best_weights = 0
-        for car in self.all_cars:
-            if(car.score > best_score):
-                best_score = car.score
-                best_weights = car.network.weights
-        print("Best score: ", best_score)
+        #Check both dead, alive and stored network for the most successful one
+        best_dead_score = 0
+        best_dead_network = 0
+
+        best_alive_score = 0
+        best_alive_network = 0
+
+        for dead_car in self.dead_cars:
+            if best_dead_score < dead_car[1]:
+                best_dead_network = dead_car[0]
+                best_dead_score = dead_car[1]
+
+        for alive_car in self.all_cars:
+            if best_alive_score < alive_car.score:
+                best_alive_network = alive_car.network
+                best_alive_score = alive_car.score
+
+        if(self.best_score < best_dead_score or self.best_score < best_alive_score):
+            if(best_dead_score > best_alive_score):
+                self.best_score = best_dead_score
+                self.best_network = best_dead_network  
+            else:
+                self.best_score = best_alive_score
+                self.best_network = best_alive_network
+        print("Best network has score", self.best_score)
         # * delimiter for every matrix, % delimiter for every row in matrix
         f = open(filename, 'w')
-        storing_weights = []
-        for weight_matrix in best_weights:
+
+        for weight_matrix in self.best_network.weights:
             for weight_vector in weight_matrix:
                 for integer in weight_vector:
                     f.write(str(integer))
@@ -245,7 +263,8 @@ class CarGame:
         data = f.read()
         data = data.split('###\n\n')
         for i in range(len(data)):
-            if(data[i] != ''):
+            if(data[i] != 
+            ''):
                 model.append([])
                 vector = data[i].split(',\n')
                 for j in range(len(vector)):
@@ -260,11 +279,17 @@ class CarGame:
         network.store_weights([np.array(wght) for wght in model])
         return network
 
-    def best_score_network(self, cars):
-        best_car = cars[-1]
-        self.best_network = best_car[0]
-        self.best_score = best_car[-1]
+    def best_score_network(self, dead_cars, alive_cars):
 
+        best_score = 0
+        for car in dead_cars:
+            if best_score < car[1]:
+                best_car = car[0]
+                best_score = car[1]
+
+        self.best_network = best_car
+        self.best_score = best_score
+        print("Best current score", self.best_score)
         return self.best_network
 
     def best_score_mean(self, cars):
@@ -284,7 +309,7 @@ class CarGame:
         self.inMenu = True
         while(self.inMenu):
             inp = input(
-                '1 train a new network [filename] [number of cars] [showmode 0/1]\n2 show network [filename] \n3 Choose map [...] \nq for quits \n4 Finetune existing weights [filename][numberofcars][showmode]\n')
+                '1 train a new network [filename] [number of cars] [showmode 0/1]\n2 show network [filename] \n3 Choose map [...] \n4 Finetune existing weights [filename][numberofcars][showmode]\nq for quits \n')
             inp = inp.split(' ')
             if(inp[0] == '1'):
                 self.train_loop(filename=inp[1], numberOfCars=int(

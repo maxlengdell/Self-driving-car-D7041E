@@ -115,14 +115,16 @@ class Car:
         if(next_move==0):
             #gear up
             if self.gear_lock > 24:
-                self.gear += 1
-                self.gear_lock = 0
+                self.gear=1
+                # self.gear += 1
+                # self.gear_lock = 0
                 if self.gear > 4:
                     self.gear = 4
 
         elif(next_move==1):
             #gear down
-            self.gear -= 1
+            #self.gear -= 1
+            self.gear = 1
             if self.gear < 1:
                 self.gear = 1
 
@@ -161,9 +163,13 @@ class Car:
             x_30_l = int(c*math.sin(theta - math.pi/6))
             y_30_l = int(c*math.cos(theta - math.pi/6))
 
+            x_10_r = int(c*math.sin(theta + math.pi/18))
+            y_10_r = int(c*math.cos(theta + math.pi/18))
+            x_10_l = int(c*math.sin(theta - math.pi/18))
+            y_10_l = int(c*math.cos(theta - math.pi/18))
+
             dist = c
 
-            #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_front,self.yc - y_front)) 
             #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_left,self.yc - y_left)) 
             #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_right,self.yc - y_right)) 
             
@@ -176,27 +182,31 @@ class Car:
             # surface_diag_left = track.get_at((self.xc + x_60_l, self.yc - y_60_l))
             # surface_diag_right = track.get_at((self.xc + x_60_r, self.yc - y_60_r))
 
-            dist_front = self.calc_distance(c, track, x_front, y_front, clr_outside_trk)
+            dist_front = self.calc_distance(c, track, x_front, y_front, clr_outside_trk, screen)
 
-            dist_left = self.calc_distance(c, track,x_left,y_left,clr_outside_trk)
-            dist_right = self.calc_distance(c, track,x_right,y_right,clr_outside_trk)
 
-            dist_60_left = self.calc_distance(c, track, x_60_l,y_60_l,clr_outside_trk)
-            dist_60_right = self.calc_distance(c, track, x_60_r,y_60_r,clr_outside_trk)
+
+            dist_left = self.calc_distance(c, track,x_left,y_left,clr_outside_trk, screen)
+            dist_right = self.calc_distance(c, track,x_right,y_right,clr_outside_trk, screen)
+
+            dist_60_left = self.calc_distance(c, track, x_60_l,y_60_l,clr_outside_trk, screen)
+            dist_60_right = self.calc_distance(c, track, x_60_r,y_60_r,clr_outside_trk, screen)
             
-            dist_30_left = self.calc_distance(c, track, x_30_l,y_30_l,clr_outside_trk)
-            dist_30_right = self.calc_distance(c, track, x_30_r,y_30_r,clr_outside_trk)
+            dist_30_left = self.calc_distance(c, track, x_30_l,y_30_l,clr_outside_trk, screen)
+            dist_30_right = self.calc_distance(c, track, x_30_r,y_30_r,clr_outside_trk, screen)
 
-            #print("Dist front", dist_front)
+            dist_10_left = self.calc_distance(c, track, x_10_l,y_10_l,clr_outside_trk, screen)
+            dist_10_right = self.calc_distance(c, track, x_10_r,y_10_r,clr_outside_trk, screen)
 
-            return [dist_front, dist_left, dist_right, dist_30_left, dist_30_right, dist_60_left, dist_60_right]
+
+            return [dist_front, dist_left, dist_right, dist_10_left, dist_10_right, dist_30_left, dist_30_right, dist_60_left, dist_60_right]
         
         except IndexError:
             print("INDEX FUCKERS")
             return [1,1,1,1,1]
         
 
-    def calc_distance(self,size_of_line,track, x_cord, y_cord, clr_outside_trk):
+    def calc_distance(self,size_of_line,track, x_cord, y_cord, clr_outside_trk, screen):
         i = 100
         while i >= 1:
             x = int(self.xc + x_cord/i)
@@ -205,6 +215,9 @@ class Car:
             ground = track.get_at((x,y))
 
             if(ground == clr_outside_trk):
+            
+                #pygame.draw.circle(screen, (0,0,0), (x,y), 5)
+
                 return size_of_line/i
             i -= 0.1
         return size_of_line

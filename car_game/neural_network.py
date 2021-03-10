@@ -23,7 +23,8 @@ class Network:
         norm_dist = self.normalize_dist(car.dist,maxRange)
 
         norm_speed = self.normalize_input(car.speed)
-        norm_gear = car.gear/4
+        #norm_gear = car.gear/4
+        norm_gear = 0
         self.layers[0] = np.concatenate([car.dist,[car.speed],[car.gear]]) #input
 
         for i in range(1,len(self.layers)):
