@@ -38,7 +38,7 @@ class Car:
         #     self.laps += [self.font.render("LAP "+str(i),1,(250,250,250))]
 
         #Network
-        self.score = 0
+        self.score = 1
         self.network = neural_network.Network(model)
 
     def inherit_and_modify_weights(self, car_obj):
@@ -115,16 +115,16 @@ class Car:
         if(next_move==0):
             #gear up
             if self.gear_lock > 24:
-                self.gear=1
-                # self.gear += 1
-                # self.gear_lock = 0
+                #self.gear=1
+                self.gear += 1
+                self.gear_lock = 0
                 if self.gear > 4:
                     self.gear = 4
 
         elif(next_move==1):
             #gear down
-            #self.gear -= 1
-            self.gear = 1
+            self.gear -= 1
+            #self.gear = 1
             if self.gear < 1:
                 self.gear = 1
 
@@ -168,8 +168,6 @@ class Car:
             x_10_l = int(c*math.sin(theta - math.pi/18))
             y_10_l = int(c*math.cos(theta - math.pi/18))
 
-            dist = c
-
             #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_left,self.yc - y_left)) 
             #pygame.draw.line(screen, (0,0,0), (self.xc,self.yc), (self.xc + x_right,self.yc - y_right)) 
             
@@ -184,8 +182,6 @@ class Car:
 
             dist_front = self.calc_distance(c, track, x_front, y_front, clr_outside_trk, screen)
 
-
-
             dist_left = self.calc_distance(c, track,x_left,y_left,clr_outside_trk, screen)
             dist_right = self.calc_distance(c, track,x_right,y_right,clr_outside_trk, screen)
 
@@ -197,7 +193,6 @@ class Car:
 
             dist_10_left = self.calc_distance(c, track, x_10_l,y_10_l,clr_outside_trk, screen)
             dist_10_right = self.calc_distance(c, track, x_10_r,y_10_r,clr_outside_trk, screen)
-
 
             return [dist_front, dist_left, dist_right, dist_10_left, dist_10_right, dist_30_left, dist_30_right, dist_60_left, dist_60_right]
         
@@ -217,7 +212,6 @@ class Car:
             if(ground == clr_outside_trk):
             
                 #pygame.draw.circle(screen, (0,0,0), (x,y), 5)
-
                 return size_of_line/i
             i -= 0.1
         return size_of_line

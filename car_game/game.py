@@ -25,9 +25,9 @@ class CarGame:
         self.best_score = 0
         self.best_network = 0
         self.dead_cars = []
-        self.network_size = [11, 17, 5]
+        self.network_size = [11, 18, 5]
         self.generation = 0
-        self.lr_decay = 1500
+        self.lr_decay = 500
         self.inMenu = True
         self.currentMap = 'T4.png'
 
@@ -113,12 +113,16 @@ class CarGame:
 
     def HUD(self):
         # self.screen.blit(self.generation,(400,400))
+
         msg_gen = "Generation: " + str(self.generation)
         msg_cars = "Current cars: " + str(len(self.all_cars))
+
+
         hud_gen = self.font.render(msg_gen, False, (0, 0, 0))
         hud_cars = self.font.render(msg_cars, False, (0, 0, 0))
         self.screen.blit(hud_gen, (400, 400))
         self.screen.blit(hud_cars, (400, 440))
+
         self.screen.blit(self.font.render(
             'Press ESC to save and quit', False, (0, 0, 0)), (400, 480))
 
@@ -191,7 +195,7 @@ class CarGame:
         self.running = True
         while self.running:
             self.screen.fill((0, 192, 0))
-            self.clock.tick(1000)
+            self.clock.tick(60)
             self.frames += 1
             self.screen.blit(self.visible_track, (0, 0))
 
