@@ -4,7 +4,7 @@ class Network:
     def __init__(self, model):
         #Input: distance left, right, forward, speed, gear
         #
-        self.lr = 0.03
+        self.lr = 0.008
         self.model = model
         self.layers = []
         self.weights = []
