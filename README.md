@@ -6,3 +6,7 @@ The network is based on the NEAT methology. Basically evolution where we randomi
 in the network and mutate the best performing one based on a few different parameters. 
 
 Either picking the best one or calculating the mean of the top performing cars
+To run tha simuklator, run following: 
+```
+python3 game.py
+```
