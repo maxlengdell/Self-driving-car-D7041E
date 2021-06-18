@@ -8,5 +8,5 @@ in the network and mutate the best performing one based on a few different param
 Either picking the best one or calculating the mean of the top performing cars
 To run tha simuklator, run following: 
 ```
-python3 cargame/game.py
+python3 car_game/game.py
 ```
